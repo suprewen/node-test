@@ -40,7 +40,7 @@ function start (route, handle) {
   const server = http.createServer(onRequest)
 
   server.listen(3001, '127.0.0.1', () => {
-    console.log('server started')
+    console.log('server started at 3001')
   })
 }
 
