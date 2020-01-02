@@ -65,6 +65,65 @@ function show (res) {
   })
 }
 
+async function asynctest (res) {
+  function getFoo () {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve('foo\n')
+      }, 3000)
+    })
+  }
+
+  function getBar () {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve('Bar\n')
+      }, 3000)
+    })
+  }
+
+  // 回调函数写法
+  function getCallback (callback) {
+    setTimeout(() => {
+      callback('callback\n')
+    }, 3000)
+  }
+
+  /* 
+  * 写在 await 之前是并发，写在 await 之后是继发
+  */
+  getCallback((data) => {
+    res.write(data)
+  })
+
+  // 以下是继发执行
+  /* 
+  * await 后面是 Promise 对象或者 thenable 对象时才会暂停等待 Promise 对象的结果（resolve 或 reject 中的参数)
+  * 否则直接返回对应的值
+  */
+  // let foo = await getFoo()
+  // let bar = await getBar()
+
+  // 并发执行, 写法 1
+  /* 
+  * Promise.all 的返回  https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
+  * Promise.all([getFoo(), getBar()]).then(res => {}) ===> res 就是 ['foo', 'bar'], 所以 await 等到的结果就是 ['foo', 'bar']
+  */
+  let [foo, bar] = await Promise.all([getFoo(), getBar()])
+
+  // 并发执行，写法 2
+  /* 
+  * 一旦新建 Promise 对象就会立即执行，所以这样可以做到并发
+  */
+  /* let fooPromise = getFoo()
+  let barPromise = getBar()
+  let foo = await fooPromise
+  let bar = await barPromise */
+
+  res.end(foo + bar)
+}
+
 exports.start = start
 exports.upload = upload
 exports.show = show
+exports.asynctest = asynctest
