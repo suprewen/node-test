@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-### accessable url
+### accessible url
 /start
 
 /upload
